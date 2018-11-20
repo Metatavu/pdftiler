@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.metatavu.pdftiler</groupId>
   <artifactId>pdftiler</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>PDF Map tiler</name>
   <description>PDF Map tiler library</description>
