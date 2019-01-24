@@ -59,7 +59,7 @@
     
     <!-- PDFBox -->
     
-    <pdfbox.version>1.8.0</pdfbox.version>
+    <pdfbox.version>2.0.13</pdfbox.version>
   </properties>
 
   <dependencies>

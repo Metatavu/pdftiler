@@ -15,10 +15,9 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
-import org.apache.pdfbox.PDFReader;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
-import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 
 /**
  * Creates images from PDF files
@@ -28,7 +27,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
  */
 public class PdfReader {
   
-  private static final Logger logger = Logger.getLogger(PDFReader.class.getName());
+  private static final Logger logger = Logger.getLogger(PdfReader.class.getName());
    
   private Settings settings;
   private PDDocument pdDocument;
@@ -49,7 +48,7 @@ public class PdfReader {
    * @throws IOException If an I/O error occurs
    */
   public List<File> createImages() throws IOException {
-    pdDocument = PDDocument.load(settings.getPdfFile());
+    pdDocument = PDDocument.load(new File(settings.getPdfFile()));
     return writeImages();
   }
   
@@ -62,15 +61,12 @@ public class PdfReader {
   private List<File> writeImages() throws IOException {
     List<File> result = new ArrayList<>();
     
-    List<PDPage> pages = getPages();
-    
     int startPage = settings.getPdfStartPage() != null ? settings.getPdfStartPage() : 0;
-    int endPage = settings.getPdfEndPage() != null ? settings.getPdfEndPage() : pages.size();
+    int endPage = settings.getPdfEndPage() != null ? settings.getPdfEndPage() : pdDocument.getNumberOfPages();
+    PDFRenderer pdfRenderer = new PDFRenderer(pdDocument);
     
     for (int i = startPage; i < endPage; i++) {
-      PDPage page = pages.get(i);
-      
-      BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, settings.getResolution());
+      BufferedImage image = pdfRenderer.renderImageWithDPI(i, settings.getResolution(), ImageType.RGB);
       result.add(writeImage(image));
     }
     
@@ -159,14 +155,4 @@ public class PdfReader {
     return param.canWriteCompressed();
   }
 
-  /**
-   * Returns PDFs pages
-   * 
-   * @return PDFs pages
-   */
-  @SuppressWarnings("unchecked")
-  private List<PDPage> getPages() {
-    PDDocumentCatalog documentCatalog = pdDocument.getDocumentCatalog();
-    return documentCatalog.getAllPages();
-  }
 }
